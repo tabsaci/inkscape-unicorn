@@ -34,7 +34,7 @@ Typical locations include:
 
 * OS X - `/Applications/Inkscape.app/Contents/Resources/extensions`
 * Linux - `/usr/share/inkscape/extensions`
-* Windows - `C:\Program Files\Inkscape\share\extensions`
+* Windows - `C:\Program Files\Inkscape\share\inkscape\extensions`
 
 Usage
 =====
