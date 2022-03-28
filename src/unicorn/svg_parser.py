@@ -1,7 +1,7 @@
 import inkex, cubicsuperpath, simplepath, simplestyle, cspsubdiv
 from simpletransform import *
 from bezmisc import *
-import entities
+import unicorn.entities
 from math import radians
 import sys, pprint
 
@@ -16,6 +16,9 @@ def parseLengthWithUnits( str ):
   u = 'px'
   s = str.strip()
   if s[-2:] == 'px':
+    s = s[:-2]
+  if s[-2:] == 'mm':
+    u = 'mm'
     s = s[:-2]
   elif s[-1:] == '%':
     u = '%'
@@ -69,13 +72,13 @@ class SvgIgnoredEntity:
     #context.codes.append("")
     return
 
-class SvgPath(entities.PolyLine):
+class SvgPath(unicorn.entities.PolyLine):
   def load(self, node, mat):
     d = node.get('d')
-    if len(simplepath.parsePath(d)) == 0:
+    if len(inkex.Path(d).to_arrays()) == 0:
       return
-    p = cubicsuperpath.parsePath(d)
-    applyTransformToPath(mat, p)
+    p = inkex.paths.CubicSuperPath(inkex.paths.Path(d))
+    p = p.transform(mat)
 
     # p is now a list of lists of cubic beziers [ctrl p1, ctrl p2, endpoint]
     # where the start-point is the last point in the previous segment
@@ -212,24 +215,25 @@ class SvgParser:
     if str:
       v, u = parseLengthWithUnits( str )
       if not v:
-        # Couldn't parse the value
+        raise ValueError ('Couldn\'t parse the value: ' + str)
         return None
-      elif ( u == '' ) or ( u == 'px' ):
+      elif ( u == '' ) or ( u == 'px' ) or ( u == 'mm'):
         return v
       elif u == '%':
         return float( default ) * v / 100.0
       else:
-        # Unsupported units
+        raise ValueError ('Unsupported units: ' + str)
         return None
     else:
       # No width specified; assume the default value
       return float( default )
 
   def parse(self):
-    # 0.28222 scale determined by comparing pixels-per-mm in a default Inkscape file.
-    self.svgWidth = self.getLength('width', 354) * 0.28222
-    self.svgHeight = self.getLength('height', 354) * 0.28222
-    self.recursivelyTraverseSvg(self.svg, [[0.28222, 0.0, -(self.svgWidth/2.0)], [0.0, -0.28222, (self.svgHeight/2.0)]])
+    #scale = 0.28222 # 0.28222 scale determined by comparing pixels-per-mm in a default Inkscape file.
+    scale = 1.0
+    self.svgWidth = self.getLength('width', 354) * scale
+    self.svgHeight = self.getLength('height', 354) * scale
+    self.recursivelyTraverseSvg(self.svg, [[scale, 0.0, 0.0], [0.0, -scale, self.svgHeight]]) # mirror on X axis, offset paralell to Y
 
   # TODO: center this thing
   def recursivelyTraverseSvg(self, nodeList, 
@@ -257,7 +261,8 @@ class SvgParser:
         pass
 
       # first apply the current matrix transform to this node's transform
-      matNew = composeTransform(matCurrent, parseTransform(node.get("transform")))
+      matNew = inkex.Transform(matCurrent) * inkex.Transform(node.get("transform")).matrix
+
 
       if node.tag == inkex.addNS('g','svg') or node.tag == 'g':
         if (node.get(inkex.addNS('groupmode','inkscape')) == 'layer'):
@@ -285,8 +290,8 @@ class SvgParser:
             pass
         else:
           pass
-      elif not isinstance(node.tag, basestring):
-        pass
+#      elif not isinstance(node.tag, basestring):
+#        pass
       else:
         entity = self.make_entity(node, matNew)
         if entity == None:

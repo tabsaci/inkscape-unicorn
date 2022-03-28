@@ -97,7 +97,7 @@ class MyEffect(inkex.Effect):
                            self.options.register_pen,
                            self.options.num_copies,
                            self.options.continuous,
-                           self.svg_file)
+                           self.options.input_file)
     parser = SvgParser(self.document.getroot(), self.options.pause_on_layer_change)
     parser.parse()
     for entity in parser.entities:
@@ -105,4 +105,4 @@ class MyEffect(inkex.Effect):
 
 if __name__ == '__main__':   #pragma: no cover
   e = MyEffect()
-  e.affect()
+  e.run()
