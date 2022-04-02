@@ -85,8 +85,11 @@ class MyEffect(inkex.Effect):
                       action="store", type=str,
                       dest="tab")
 
-  def output(self):
-    self.context.generate()
+  def has_changed(self, ret):
+    return True
+
+  def save(self, stream):
+    self.context.generate(stream)
 
   def effect(self):
     self.context = GCodeContext(self.options.xy_feedrate, self.options.z_feedrate, 
