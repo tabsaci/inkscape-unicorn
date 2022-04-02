@@ -28,15 +28,15 @@ class MyEffect(inkex.Effect):
     inkex.Effect.__init__(self)
     self.arg_parser.add_argument("--start-delay",
                       action="store", type=float,
-                      dest="start_delay", default="150.0",
+                      dest="start_delay", default="20.0",
                       help="Delay after pen down command before movement in milliseconds")
     self.arg_parser.add_argument("--stop-delay",
                       action="store", type=float,
-                      dest="stop_delay", default="150.0",
+                      dest="stop_delay", default="20.0",
                       help="Delay after pen up command before movement in milliseconds")
     self.arg_parser.add_argument("--xy-feedrate",
                       action="store", type=float,
-                      dest="xy_feedrate", default="3500.0",
+                      dest="xy_feedrate", default="100.0",
                       help="XY axes feedrate in mm/min")
     self.arg_parser.add_argument("--z-feedrate",
                       action="store", type=float,

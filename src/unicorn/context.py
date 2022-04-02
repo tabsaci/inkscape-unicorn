@@ -29,8 +29,6 @@ class GCodeContext:
 
       self.startCommand =  "M106"
       self.endCommand = "M107"
-      self.start_delay = 20.0
-      self.stop_delay = 20.0
 
       self.postscript = [
         "",
