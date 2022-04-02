@@ -108,11 +108,11 @@ class SvgRect(SvgPath):
     w = float(node.get('width'))
     h = float(node.get('height'))
     a = []
-    a.append(['M ', [x,y]])
-    a.append([' l ', [w,0]])
-    a.append([' l ', [0,h]])
-    a.append([' l ', [-w,0]])
-    a.append([' Z', []])
+    a.append(['M', [x,y]])
+    a.append(['l', [w,0]])
+    a.append(['l', [0,h]])
+    a.append(['l', [-w,0]])
+    a.append(['Z', []])
     newpath.set('d', simplepath.formatPath(a))
     SvgPath.load(self,newpath,mat)
 
@@ -124,8 +124,8 @@ class SvgLine(SvgPath):
     x2 = float(node.get('x2'))
     y2 = float(node.get('y2'))
     a = []
-    a.append(['M ', [x1,y1]])
-    a.append([' L ', [x2,y2]])
+    a.append(['M', [x1,y1]])
+    a.append(['L', [x2,y2]])
     newpath.set('d', simplepath.formatPath(a))
     SvgPath.load(self,newpath,mat)
 
