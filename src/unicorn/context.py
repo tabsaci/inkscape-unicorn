@@ -2,20 +2,17 @@ from math import *
 import sys
 
 class GCodeContext:
-    def __init__(self, xy_feedrate, z_feedrate, start_delay, stop_delay, pen_up_angle, pen_down_angle, z_height, finished_height, x_home, y_home, register_pen, num_pages, continuous, file):
+    def __init__(self, xy_feedrate, z_feedrate, start_delay, stop_delay, z_height, finished_height, x_home, y_home, register_pen, num_pages, file):
       self.xy_feedrate = xy_feedrate
       self.z_feedrate = z_feedrate
       self.start_delay = start_delay
       self.stop_delay = stop_delay
-      self.pen_up_angle = pen_up_angle
-      self.pen_down_angle = pen_down_angle
       self.z_height = z_height
       self.finished_height = finished_height
       self.x_home = x_home
       self.y_home = y_home
       self.register_pen = register_pen
       self.num_pages = num_pages
-      self.continuous = continuous
       self.file = file
       
       self.drawing = False
@@ -30,10 +27,6 @@ class GCodeContext:
         ""
       ]
 
-      self.startCommand =  "M300 S%0.2F (pen down)" % self.pen_down_angle
-      self.endCommand = "M300 S%0.2F (pen up)" % self.pen_up_angle
-
-      self.continuous = False
       self.startCommand =  "M106"
       self.endCommand = "M107"
       self.start_delay = 20.0
@@ -89,35 +82,24 @@ class GCodeContext:
         "(End of sheet footer)",
       ]
 
-      self.loop_forever = [ "M30 (Plot again?)" ]
-
       self.codes = []
 
     def generate(self, stream):
-      if self.continuous == 'true':
-        self.num_pages = 1
-
       codesets = [self.preamble]
-      if (self.continuous == 'true' or self.num_pages > 1):
+      if (self.num_pages > 1):
         codesets.append(self.sheet_header)
       elif self.register_pen == 'true':
         codesets.append(self.registration)
       codesets.append(self.codes)
-      if (self.continuous == 'true' or self.num_pages > 1):
+      if (self.num_pages > 1):
         codesets.append(self.sheet_footer)
 
-      if self.continuous == 'true':
-        codesets.append(self.loop_forever)
+      for p in range(0,self.num_pages):
         for codeset in codesets:
           for line in codeset:
-             stream.write((line + '\n').encode ('ascii'))
-      else:
-        for p in range(0,self.num_pages):
-          for codeset in codesets:
-            for line in codeset:
-              stream.write ((line + '\n').encode ('ascii'))
-          for line in self.postscript:
-              stream.write ((line + '\n').encode ('ascii'))
+            stream.write ((line + '\n').encode ('ascii'))
+        for line in self.postscript:
+            stream.write ((line + '\n').encode ('ascii'))
 
     def start(self):
       self.codes.append(self.startCommand)

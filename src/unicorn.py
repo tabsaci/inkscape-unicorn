@@ -26,14 +26,6 @@ from unicorn.svg_parser import SvgParser
 class MyEffect(inkex.Effect):
   def __init__(self):
     inkex.Effect.__init__(self)
-    self.arg_parser.add_argument("--pen-up-angle",
-                      action="store", type=float,
-                      dest="pen_up_angle", default="50.0",
-                      help="Pen Up Angle")
-    self.arg_parser.add_argument("--pen-down-angle",
-                      action="store", type=float,
-                      dest="pen_down_angle", default="30.0",
-                      help="Pen Down Angle")
     self.arg_parser.add_argument("--start-delay",
                       action="store", type=float,
                       dest="start_delay", default="150.0",
@@ -73,10 +65,6 @@ class MyEffect(inkex.Effect):
     self.arg_parser.add_argument("--num-copies",
                       action="store", type=int,
                       dest="num_copies", default="1")
-    self.arg_parser.add_argument("--continuous",
-                      action="store", type=str,
-                      dest="continuous", default="false",
-                      help="Plot continuously until stopped.")
     self.arg_parser.add_argument("--pause-on-layer-change",
                       action="store", type=str,
                       dest="pause_on_layer_change", default="false",
@@ -94,12 +82,10 @@ class MyEffect(inkex.Effect):
   def effect(self):
     self.context = GCodeContext(self.options.xy_feedrate, self.options.z_feedrate, 
                            self.options.start_delay, self.options.stop_delay,
-                           self.options.pen_up_angle, self.options.pen_down_angle,
                            self.options.z_height, self.options.finished_height,
                            self.options.x_home, self.options.y_home,
                            self.options.register_pen,
                            self.options.num_copies,
-                           self.options.continuous,
                            self.options.input_file)
     parser = SvgParser(self.document.getroot(), self.options.pause_on_layer_change)
     parser.parse()
