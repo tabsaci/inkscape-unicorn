@@ -70,9 +70,7 @@ class GCodeContext:
         return
       else:
         if self.drawing: 
-            self.codes.append(self.endCommand) 
-            self.codes.append("G4 P%d (wait %dms)" % (self.stop_delay, self.stop_delay))
-            self.drawing = False
+            self.stop ()
         self.codes.append("G1 X%.2f Y%.2f F%.2f" % (x,y, self.xyz_speed))
       self.last = (x,y)
 	
@@ -83,8 +81,6 @@ class GCodeContext:
         return
       else:
         if self.drawing == False:
-            self.codes.append(self.endCommand)
-            self.codes.append("G4 P%d (wait %dms)" % (self.start_delay, self.start_delay))
-            self.drawing = True
+            self.start ()
         self.codes.append("G1 X%0.2f Y%0.2f F%0.2f" % (x,y, self.xyz_speed))
       self.last = (x,y)
