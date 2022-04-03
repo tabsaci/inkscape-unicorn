@@ -2,12 +2,11 @@ from math import *
 import sys
 
 class GCodeContext:
-    def __init__(self, xyz_speed, start_delay, stop_delay, z_height, finished_height, x_home, y_home, num_runs, file):
+    def __init__(self, xyz_speed, start_delay, stop_delay, z_height, x_home, y_home, num_runs, file):
       self.xyz_speed = xyz_speed
       self.start_delay = start_delay
       self.stop_delay = stop_delay
       self.z_height = z_height
-      self.finished_height = finished_height
       self.x_home = x_home
       self.y_home = y_home
       self.num_runs = num_runs
@@ -35,7 +34,6 @@ class GCodeContext:
 		"G4 P%d (wait %dms)" % (self.stop_delay, self.stop_delay),
 		"M300 S255 (turn off servo)",
 		"G1 X0 Y0 F%0.2F" % self.xyz_speed,
-		"G1 Z%0.2F F%0.2F (go up to finished level)" % (self.finished_height, self.xyz_speed),
 		"G1 X%0.2F Y%0.2F F%0.2F (go home)" % (self.x_home, self.y_home, self.xyz_speed),
 		"M18 (drives off)",
       ]

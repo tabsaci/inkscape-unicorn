@@ -42,10 +42,6 @@ class MyEffect(inkex.Effect):
                       action="store", type=float,
                       dest="z_height", default="0.0",
                       help="Z axis print height in mm")
-    self.arg_parser.add_argument("--finished-height",
-                      action="store", type=float,
-                      dest="finished_height", default="0.0",
-                      help="Z axis height after printing in mm")
     self.arg_parser.add_argument("--x-home",
                       action="store", type=float,
                       dest="x_home", default="0.0",
@@ -70,7 +66,7 @@ class MyEffect(inkex.Effect):
   def effect(self):
     self.context = GCodeContext(self.options.xyz_speed, 
                            self.options.start_delay, self.options.stop_delay,
-                           self.options.z_height, self.options.finished_height,
+                           self.options.z_height,
                            self.options.x_home, self.options.y_home,
                            self.options.num_runs,
                            self.options.input_file)
