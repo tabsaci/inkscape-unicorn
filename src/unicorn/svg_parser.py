@@ -114,7 +114,7 @@ class SvgRect(SvgPath):
     a.append(['l', [0,h]])
     a.append(['l', [-w,0]])
     a.append(['Z', []])
-    newpath.set('d', simplepath.formatPath(a))
+    newpath.set('d', str(Path(a)))
     SvgPath.load(self,newpath,mat)
 
 class SvgLine(SvgPath):
@@ -127,7 +127,7 @@ class SvgLine(SvgPath):
     a = []
     a.append(['M', [x1,y1]])
     a.append(['L', [x2,y2]])
-    newpath.set('d', simplepath.formatPath(a))
+    newpath.set('d', str(Path(a)))
     SvgPath.load(self,newpath,mat)
 
 class SvgPolyLine(SvgPath):
