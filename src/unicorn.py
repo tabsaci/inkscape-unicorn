@@ -50,10 +50,6 @@ class MyEffect(inkex.Effect):
                       action="store", type=float,
                       dest="finished_height", default="0.0",
                       help="Z axis height after printing in mm")
-    self.arg_parser.add_argument("--register-pen",
-                      action="store", type=str,
-                      dest="register_pen", default="true",
-                      help="Add pen registration check(s)")
     self.arg_parser.add_argument("--x-home",
                       action="store", type=float,
                       dest="x_home", default="0.0",
@@ -84,7 +80,6 @@ class MyEffect(inkex.Effect):
                            self.options.start_delay, self.options.stop_delay,
                            self.options.z_height, self.options.finished_height,
                            self.options.x_home, self.options.y_home,
-                           self.options.register_pen,
                            self.options.num_copies,
                            self.options.input_file)
     parser = SvgParser(self.document.getroot(), self.options.pause_on_layer_change)

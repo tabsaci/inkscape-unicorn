@@ -2,7 +2,7 @@ from math import *
 import sys
 
 class GCodeContext:
-    def __init__(self, xy_feedrate, z_feedrate, start_delay, stop_delay, z_height, finished_height, x_home, y_home, register_pen, num_pages, file):
+    def __init__(self, xy_feedrate, z_feedrate, start_delay, stop_delay, z_height, finished_height, x_home, y_home, num_pages, file):
       self.xy_feedrate = xy_feedrate
       self.z_feedrate = z_feedrate
       self.start_delay = start_delay
@@ -11,7 +11,6 @@ class GCodeContext:
       self.finished_height = finished_height
       self.x_home = x_home
       self.y_home = y_home
-      self.register_pen = register_pen
       self.num_pages = num_pages
       self.file = file
       
@@ -27,7 +26,7 @@ class GCodeContext:
         ""
       ]
 
-      self.startCommand =  "M106"
+      self.startCommand = "M106"
       self.endCommand = "M107"
 
       self.postscript = [
@@ -42,25 +41,11 @@ class GCodeContext:
 				"M18 (drives off)",
       ]
 
-      self.registration = [
-        self.startCommand,
-        "G4 P%d (wait %dms)" % (self.start_delay, self.start_delay),
-        self.endCommand,
-        "G4 P%d (wait %dms)" % (self.stop_delay, self.stop_delay),
-        "M18 (disengage drives)",
-        "M01 (Was registration test successful?)",
-        "M17 (engage drives if YES, and continue)",
-        ""
-      ]
-
       self.sheet_header = [
         "(start of sheet header)",
         "G92 X%.2f Y%.2f Z%.2f (you are here)" % (self.x_home, self.y_home, self.z_height),
+        "(end of sheet header)",
       ]
-      if self.register_pen == 'true':
-        self.sheet_header.extend(self.registration)
-      self.sheet_header.append("(end of sheet header)")
-
       self.sheet_footer = [
         "(Start of sheet footer.)",
         self.endCommand,
@@ -86,8 +71,6 @@ class GCodeContext:
       codesets = [self.preamble]
       if (self.num_pages > 1):
         codesets.append(self.sheet_header)
-      elif self.register_pen == 'true':
-        codesets.append(self.registration)
       codesets.append(self.codes)
       if (self.num_pages > 1):
         codesets.append(self.sheet_footer)
