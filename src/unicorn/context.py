@@ -60,10 +60,8 @@ class GCodeContext:
       self.codes.append("G4 P%d (wait %dms)" % (self.delay, self.delay))
       self.drawing = False
 
-    def go_to_point(self, x, y, stop=False):
+    def go_to_point(self, x, y):
       if self.actPosition == (x,y):
-        return
-      if stop:
         return
       else:
         if self.drawing: 
@@ -71,11 +69,9 @@ class GCodeContext:
         self.codes.append("G1 X%.2f Y%.2f F%.2f" % (x,y, self.xyz_speed))
       self.actPosition = (x,y)
 	
-    def draw_to_point(self, x, y, stop=False):
+    def draw_to_point(self, x, y):
       if self.actPosition == (x,y):
           return
-      if stop:
-        return
       else:
         if self.drawing == False:
             self.start ()
