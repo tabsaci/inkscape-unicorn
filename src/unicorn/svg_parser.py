@@ -10,7 +10,7 @@ def parseLengthWithUnits( str ):
   '''
   Parse an SVG value which may or may not have units attached
   This version is greatly simplified in that it only allows: no units,
-  units of px, and units of %.  Everything else, it returns None for.
+  units of px, mm, and units of %.  Everything else, it returns None for.
   There is a more general routine to consider in scour.py if more
   generality is ever needed.
   '''
@@ -223,8 +223,10 @@ class SvgParser:
       return float( default )
 
   def parse(self):
-    #scale = 0.28222 # 0.28222 scale determined by comparing pixels-per-mm in a default Inkscape file.
-    scale = 1.0
+    v, u = parseLengthWithUnits (self.svg.get('width'));
+    scale = 0.28222 # 0.28222 scale determined by comparing pixels-per-mm in a default Inkscape file.
+    if (u == 'mm'):
+        scale = 1.0  
     self.svgWidth = self.getLength('width', 354) * scale
     self.svgHeight = self.getLength('height', 354) * scale
     self.recursivelyTraverseSvg(self.svg, [[scale, 0.0, 0.0], [0.0, -scale, self.svgHeight]]) # mirror on X axis, offset paralell to Y
