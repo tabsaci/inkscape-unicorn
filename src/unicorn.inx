@@ -10,12 +10,12 @@
       <param name="delay" type="float" min="0.0" max="1000.0" _gui-text="Delay after laser on/off command before movement in milliseconds.">20.0</param>
       <param name="xyz-speed" type="float" min="10.0" max="5000.0" _gui-text="XYZ axes speed in mm/min.">100.0</param>
       <param name="z-height" type="float" min="0.0" max="110.0" _gui-text="Z-axis print height in mm.">0.0</param>
-	  <param name="x-home" type="float" min="-100.00" max="100.00" _gui-text="Pen starts at X value:">0.00</param>
-	  <param name="y-home" type="float" min="-100.00" max="100.00" _gui-text="Pen starts at Y value:">0.00</param>
-	  <param name="num-runs" type="int" min="1" _gui-text="Number of repeting the drawing process">1</param>
+	  <param name="x-home" type="float" min="-100.00" max="100.00" _gui-text="Laser starts at X value:">0.00</param>
+	  <param name="y-home" type="float" min="-100.00" max="100.00" _gui-text="Laser starts at Y value:">0.00</param>
+	  <param name="num-runs" type="int" min="1" _gui-text="Number of repeating the drawing process">1</param>
     </page>
     <page name="help" _gui-text="Help">
-      <_param name="ext_help" type="description" xml:space="preserve">MakerBot Unicorn G-Code Output.
+      <_param name="ext_help" type="description" xml:space="preserve">G-Code Output for laser engraving.
 
 - All text must be converted to paths.
 - Curves are approximated with line segments.

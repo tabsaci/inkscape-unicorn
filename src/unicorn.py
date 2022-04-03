@@ -49,7 +49,7 @@ class MyEffect(inkex.Effect):
     self.arg_parser.add_argument("--num-runs",
                       action="store", type=int,
                       dest="num_runs", default="1",
-                      help="Number of repeting the drawing process")
+                      help="Number of repeating the drawing process")
     self.arg_parser.add_argument("--tab",
                       action="store", type=str,
                       dest="tab")
