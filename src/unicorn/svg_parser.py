@@ -3,6 +3,7 @@ from simpletransform import *
 from bezmisc import *
 import unicorn.entities
 from math import radians
+from lxml import etree
 import sys, pprint
 
 def parseLengthWithUnits( str ):
@@ -91,7 +92,7 @@ class SvgPath(unicorn.entities.PolyLine):
       self.segments.append(points)
 
   def new_path_from_node(self, node):
-    newpath = inkex.etree.Element(inkex.addNS('path','svg'))
+    newpath = etree.Element(inkex.addNS('path','svg'))
     s = node.get('style')
     if s:
       newpath.set('style',s)
