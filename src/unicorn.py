@@ -26,14 +26,10 @@ from unicorn.svg_parser import SvgParser
 class MyEffect(inkex.Effect):
   def __init__(self):
     inkex.Effect.__init__(self)
-    self.arg_parser.add_argument("--start-delay",
+    self.arg_parser.add_argument("--delay",
                       action="store", type=float,
-                      dest="start_delay", default="20.0",
-                      help="Delay after pen down command before movement in milliseconds")
-    self.arg_parser.add_argument("--stop-delay",
-                      action="store", type=float,
-                      dest="stop_delay", default="20.0",
-                      help="Delay after pen up command before movement in milliseconds")
+                      dest="delay", default="20.0",
+                      help="Delay after laser on/off command before movement in milliseconds")
     self.arg_parser.add_argument("--xyz-speed",
                       action="store", type=float,
                       dest="xyz_speed", default="100.0",
@@ -65,7 +61,7 @@ class MyEffect(inkex.Effect):
 
   def effect(self):
     self.context = GCodeContext(self.options.xyz_speed, 
-                           self.options.start_delay, self.options.stop_delay,
+                           self.options.delay,
                            self.options.z_height,
                            self.options.x_home, self.options.y_home,
                            self.options.num_runs,

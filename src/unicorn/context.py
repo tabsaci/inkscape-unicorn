@@ -2,10 +2,9 @@ from math import *
 import sys
 
 class GCodeContext:
-    def __init__(self, xyz_speed, start_delay, stop_delay, z_height, x_home, y_home, num_runs, file):
+    def __init__(self, xyz_speed, delay, z_height, x_home, y_home, num_runs, file):
       self.xyz_speed = xyz_speed
-      self.start_delay = start_delay
-      self.stop_delay = stop_delay
+      self.delay = delay
       self.z_height = z_height
       self.x_home = x_home
       self.y_home = y_home
@@ -31,7 +30,7 @@ class GCodeContext:
         "",
 		"(end of print job)",
 		self.endCommand,
-		"G4 P%d (wait %dms)" % (self.stop_delay, self.stop_delay),
+		"G4 P%d (wait %dms)" % (self.delay, self.delay),
 		"M300 S255 (turn off servo)",
 		"G1 X0 Y0 F%0.2F" % self.xyz_speed,
 		"G1 X%0.2F Y%0.2F F%0.2F (go home)" % (self.x_home, self.y_home, self.xyz_speed),
@@ -53,12 +52,12 @@ class GCodeContext:
 
     def start(self):
       self.codes.append(self.startCommand)
-      self.codes.append("G4 P%d (wait %dms)" % (self.start_delay, self.start_delay))
+      self.codes.append("G4 P%d (wait %dms)" % (self.delay, self.delay))
       self.drawing = True
 
     def stop(self):
       self.codes.append(self.endCommand)
-      self.codes.append("G4 P%d (wait %dms)" % (self.stop_delay, self.stop_delay))
+      self.codes.append("G4 P%d (wait %dms)" % (self.delay, self.delay))
       self.drawing = False
 
     def go_to_point(self, x, y, stop=False):
