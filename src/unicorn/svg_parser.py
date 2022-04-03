@@ -176,12 +176,6 @@ class SvgText(SvgIgnoredEntity):
     inkex.errormsg('Warning: unable to draw text. please convert it to a path first.')
     SvgIgnoredEntity.load(self,node,mat)
 
-class SvgLayerChange():
-  def __init__(self,layer_name):
-    self.layer_name = layer_name
-  def get_gcode(self,context):
-    context.codes.append("M01 (Plotting layer '%s')" % self.layer_name)
-
 class SvgParser:
 
   entity_map = {
@@ -200,9 +194,8 @@ class SvgParser:
     'text': SvgText
   }
 
-  def __init__(self, svg, pause_on_layer_change='false'):
+  def __init__(self, svg):
     self.svg = svg
-    self.pause_on_layer_change = pause_on_layer_change
     self.entities = []
 
   def getLength( self, name, default ):
@@ -267,8 +260,6 @@ class SvgParser:
       if node.tag == inkex.addNS('g','svg') or node.tag == 'g':
         if (node.get(inkex.addNS('groupmode','inkscape')) == 'layer'):
           layer_name = node.get(inkex.addNS('label','inkscape'))
-          if(self.pause_on_layer_change == 'true'):
-            self.entities.append(SvgLayerChange(layer_name))
         self.recursivelyTraverseSvg(node, matNew, parent_visibility = v)
       elif node.tag == inkex.addNS('use','svg') or node.tag == 'use':
         refid = node.get(inkex.addNS('href','xlink'))

@@ -57,10 +57,6 @@ class MyEffect(inkex.Effect):
     self.arg_parser.add_argument("--num-runs",
                       action="store", type=int,
                       dest="num_runs", default="1")
-    self.arg_parser.add_argument("--pause-on-layer-change",
-                      action="store", type=str,
-                      dest="pause_on_layer_change", default="false",
-                      help="Pause on layer changes.")
     self.arg_parser.add_argument("--tab",
                       action="store", type=str,
                       dest="tab")
@@ -78,7 +74,7 @@ class MyEffect(inkex.Effect):
                            self.options.x_home, self.options.y_home,
                            self.options.num_runs,
                            self.options.input_file)
-    parser = SvgParser(self.document.getroot(), self.options.pause_on_layer_change)
+    parser = SvgParser(self.document.getroot())
     parser.parse()
     for entity in parser.entities:
       entity.get_gcode(self.context)
