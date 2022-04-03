@@ -14,7 +14,7 @@ class GCodeContext:
       self.file = file
       
       self.drawing = False
-      self.last = None
+      self.actPosition = None
 
       self.preamble = [
         "(Scribbled version of %s @ %.2f)" % (self.file, self.xyz_speed),
@@ -30,14 +30,14 @@ class GCodeContext:
 
       self.postscript = [
         "",
-				"(end of print job)",
-				self.endCommand,
-				"G4 P%d (wait %dms)" % (self.stop_delay, self.stop_delay),
-				"M300 S255 (turn off servo)",
-				"G1 X0 Y0 F%0.2F" % self.xyz_speed,
-				"G1 Z%0.2F F%0.2F (go up to finished level)" % (self.finished_height, self.xyz_speed),
-				"G1 X%0.2F Y%0.2F F%0.2F (go home)" % (self.x_home, self.y_home, self.xyz_speed),
-				"M18 (drives off)",
+		"(end of print job)",
+		self.endCommand,
+		"G4 P%d (wait %dms)" % (self.stop_delay, self.stop_delay),
+		"M300 S255 (turn off servo)",
+		"G1 X0 Y0 F%0.2F" % self.xyz_speed,
+		"G1 Z%0.2F F%0.2F (go up to finished level)" % (self.finished_height, self.xyz_speed),
+		"G1 X%0.2F Y%0.2F F%0.2F (go home)" % (self.x_home, self.y_home, self.xyz_speed),
+		"M18 (drives off)",
       ]
 
       self.codes = []
@@ -64,7 +64,7 @@ class GCodeContext:
       self.drawing = False
 
     def go_to_point(self, x, y, stop=False):
-      if self.last == (x,y):
+      if self.actPosition == (x,y):
         return
       if stop:
         return
@@ -72,10 +72,10 @@ class GCodeContext:
         if self.drawing: 
             self.stop ()
         self.codes.append("G1 X%.2f Y%.2f F%.2f" % (x,y, self.xyz_speed))
-      self.last = (x,y)
+      self.actPosition = (x,y)
 	
     def draw_to_point(self, x, y, stop=False):
-      if self.last == (x,y):
+      if self.actPosition == (x,y):
           return
       if stop:
         return
@@ -83,4 +83,4 @@ class GCodeContext:
         if self.drawing == False:
             self.start ()
         self.codes.append("G1 X%0.2f Y%0.2f F%0.2f" % (x,y, self.xyz_speed))
-      self.last = (x,y)
+      self.actPosition = (x,y)
