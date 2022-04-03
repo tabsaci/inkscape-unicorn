@@ -58,9 +58,9 @@ class MyEffect(inkex.Effect):
                       action="store", type=float,
                       dest="y_home", default="0.0",
                       help="Starting Y position")
-    self.arg_parser.add_argument("--num-copies",
+    self.arg_parser.add_argument("--num-runs",
                       action="store", type=int,
-                      dest="num_copies", default="1")
+                      dest="num_runs", default="1")
     self.arg_parser.add_argument("--pause-on-layer-change",
                       action="store", type=str,
                       dest="pause_on_layer_change", default="false",
@@ -80,7 +80,7 @@ class MyEffect(inkex.Effect):
                            self.options.start_delay, self.options.stop_delay,
                            self.options.z_height, self.options.finished_height,
                            self.options.x_home, self.options.y_home,
-                           self.options.num_copies,
+                           self.options.num_runs,
                            self.options.input_file)
     parser = SvgParser(self.document.getroot(), self.options.pause_on_layer_change)
     parser.parse()

@@ -2,7 +2,7 @@ from math import *
 import sys
 
 class GCodeContext:
-    def __init__(self, xy_feedrate, z_feedrate, start_delay, stop_delay, z_height, finished_height, x_home, y_home, num_pages, file):
+    def __init__(self, xy_feedrate, z_feedrate, start_delay, stop_delay, z_height, finished_height, x_home, y_home, num_runs, file):
       self.xy_feedrate = xy_feedrate
       self.z_feedrate = z_feedrate
       self.start_delay = start_delay
@@ -11,7 +11,7 @@ class GCodeContext:
       self.finished_height = finished_height
       self.x_home = x_home
       self.y_home = y_home
-      self.num_pages = num_pages
+      self.num_runs = num_runs
       self.file = file
       
       self.drawing = False
@@ -41,41 +41,13 @@ class GCodeContext:
 				"M18 (drives off)",
       ]
 
-      self.sheet_header = [
-        "(start of sheet header)",
-        "G92 X%.2f Y%.2f Z%.2f (you are here)" % (self.x_home, self.y_home, self.z_height),
-        "(end of sheet header)",
-      ]
-      self.sheet_footer = [
-        "(Start of sheet footer.)",
-        self.endCommand,
-        "G4 P%d (wait %dms)" % (self.stop_delay, self.stop_delay),
-        "G91 (relative mode)",
-        "G0 Z15 F%0.2f" % (self.z_feedrate),
-        "G90 (absolute mode)",
-        "G0 X%0.2f Y%0.2f F%0.2f" % (self.x_home, self.y_home, self.xy_feedrate),
-        "M01 (Have you retrieved the print?)",
-        "(machine halts until 'okay')",
-        "G4 P%d (wait %dms)" % (self.start_delay, self.start_delay),
-        "G91 (relative mode)",
-        "G0 Z-15 F%0.2f (return to start position of current sheet)" % (self.z_feedrate),
-        "G0 Z-0.01 F%0.2f (move down one sheet)" % (self.z_feedrate),
-        "G90 (absolute mode)",
-        "M18 (disengage drives)",
-        "(End of sheet footer)",
-      ]
-
       self.codes = []
 
     def generate(self, stream):
       codesets = [self.preamble]
-      if (self.num_pages > 1):
-        codesets.append(self.sheet_header)
       codesets.append(self.codes)
-      if (self.num_pages > 1):
-        codesets.append(self.sheet_footer)
 
-      for p in range(0,self.num_pages):
+      for p in range(0,self.num_runs):
         for codeset in codesets:
           for line in codeset:
             stream.write ((line + '\n').encode ('ascii'))
