@@ -222,11 +222,17 @@ class SvgParser:
       # No width specified; assume the default value
       return float( default )
 
+  def getScaleOfSVG (self):
+    str = self.svg.get ('width')
+    if (str):
+       v, u = parseLengthWithUnits (str);
+       if (u == 'mm'):
+        return 1.0  
+    return 0.28222 # 0.28222 scale determined by comparing pixels-per-mm in a default Inkscape file.
+    
+
   def parse(self):
-    v, u = parseLengthWithUnits (self.svg.get('width'));
-    scale = 0.28222 # 0.28222 scale determined by comparing pixels-per-mm in a default Inkscape file.
-    if (u == 'mm'):
-        scale = 1.0  
+    scale = self.getScaleOfSVG ()  
     self.svgWidth = self.getLength('width', 354) * scale
     self.svgHeight = self.getLength('height', 354) * scale
     self.recursivelyTraverseSvg(self.svg, [[scale, 0.0, 0.0], [0.0, -scale, self.svgHeight]]) # mirror on X axis, offset paralell to Y
