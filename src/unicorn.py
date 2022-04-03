@@ -34,14 +34,10 @@ class MyEffect(inkex.Effect):
                       action="store", type=float,
                       dest="stop_delay", default="20.0",
                       help="Delay after pen up command before movement in milliseconds")
-    self.arg_parser.add_argument("--xy-feedrate",
+    self.arg_parser.add_argument("--xyz-speed",
                       action="store", type=float,
-                      dest="xy_feedrate", default="100.0",
-                      help="XY axes feedrate in mm/min")
-    self.arg_parser.add_argument("--z-feedrate",
-                      action="store", type=float,
-                      dest="z_feedrate", default="150.0",
-                      help="Z axis feedrate in mm/min")
+                      dest="xyz_speed", default="100.0",
+                      help="XYZ axes speed in mm/min")
     self.arg_parser.add_argument("--z-height",
                       action="store", type=float,
                       dest="z_height", default="0.0",
@@ -76,7 +72,7 @@ class MyEffect(inkex.Effect):
     self.context.generate(stream)
 
   def effect(self):
-    self.context = GCodeContext(self.options.xy_feedrate, self.options.z_feedrate, 
+    self.context = GCodeContext(self.options.xyz_speed, 
                            self.options.start_delay, self.options.stop_delay,
                            self.options.z_height, self.options.finished_height,
                            self.options.x_home, self.options.y_home,
