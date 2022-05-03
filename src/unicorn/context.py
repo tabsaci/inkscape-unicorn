@@ -77,8 +77,15 @@ class GCodeContext:
       self.codes.append("G4 P%d (wait %dms)" % (self.delay, self.delay))
       self.drawing = False
 
+    def isAt (self, x, y):
+      if self.actPosition is None or x is None or y is None:
+        return False
+      xEqual = round (self.actPosition[0], 2) == round (x, 2)
+      yEqual = round (self.actPosition[1], 2) == round (y, 2)
+      return xEqual and yEqual
+
     def go_to_point(self, x, y):
-      if self.actPosition == (x,y):
+      if self.isAt (x, y):
         return
       else:
         if self.drawing: 
@@ -87,7 +94,7 @@ class GCodeContext:
       self.actPosition = (x,y)
 
     def draw_to_point(self, x, y):
-      if self.actPosition == (x,y):
+      if self.isAt (x, y):
           return
       else:
         if self.drawing == False:
