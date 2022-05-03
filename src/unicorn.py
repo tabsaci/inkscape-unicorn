@@ -30,22 +30,30 @@ class MyEffect(inkex.Effect):
                       action="store", type=float,
                       dest="delay", default="20.0",
                       help="Delay after laser on/off command before movement in milliseconds")
+    self.arg_parser.add_argument("--goHome",
+                      action="store", type=str,
+                      dest="goHome", default="false",
+                      help="Autohome, and go to xyz offset before starting")
     self.arg_parser.add_argument("--xyz-speed",
                       action="store", type=float,
-                      dest="xyz_speed", default="100.0",
+                      dest="xyz_speed", default="500.0",
                       help="XYZ axes speed in mm/min")
-    self.arg_parser.add_argument("--z-height",
+    self.arg_parser.add_argument("--travel-speed",
                       action="store", type=float,
-                      dest="z_height", default="0.0",
-                      help="Z axis print height in mm")
-    self.arg_parser.add_argument("--x-home",
+                      dest="travel_speed", default="6000.0",
+                      help="Travel speed in mm/min")
+    self.arg_parser.add_argument("--x-offset",
                       action="store", type=float,
-                      dest="x_home", default="0.0",
+                      dest="x_offset", default="52.0",
                       help="Starting X position")
-    self.arg_parser.add_argument("--y-home",
+    self.arg_parser.add_argument("--y-offset",
                       action="store", type=float,
-                      dest="y_home", default="0.0",
+                      dest="y_offset", default="14.0",
                       help="Starting Y position")
+    self.arg_parser.add_argument("--z-offset",
+                      action="store", type=float,
+                      dest="z_offset", default="95.0",
+                      help="Starting Z position")
     self.arg_parser.add_argument("--num-runs",
                       action="store", type=int,
                       dest="num_runs", default="1",
@@ -61,10 +69,14 @@ class MyEffect(inkex.Effect):
     self.context.generate(stream)
 
   def effect(self):
-    self.context = GCodeContext(self.options.xyz_speed, 
+    self.context = GCodeContext(
+                           self.options.xyz_speed, 
+                           self.options.travel_speed,
                            self.options.delay,
-                           self.options.z_height,
-                           self.options.x_home, self.options.y_home,
+                           self.options.goHome == 'true',
+                           self.options.x_offset,
+                           self.options.y_offset,
+                           self.options.z_offset,
                            self.options.num_runs,
                            self.options.input_file)
     parser = SvgParser(self.document.getroot())
