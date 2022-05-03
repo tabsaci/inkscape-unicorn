@@ -34,6 +34,7 @@ class GCodeContext:
         self.preamble += [
           "G28 ; Home all axes",
           "G0 X%0.2F Y%0.2F Z%0.2F (go to start point)" % (self.x_offset, self.y_offset, self.z_offset),
+          "M0 Turn on laser to set the focus point",
           self.startCommand,
           "M0 Set focus point of the laser",
           self.endCommand
