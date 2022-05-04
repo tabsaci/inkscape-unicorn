@@ -58,15 +58,13 @@ class GCodeContext:
       self.codes = []
 
     def generate(self, stream):
-      codesets = [self.preamble]
-      codesets.append(self.codes)
-
+      for line in self.preamble:
+          stream.write ((line + '\n').encode ('ascii'))
       for p in range(0,self.num_runs):
-        for codeset in codesets:
-          for line in codeset:
-            stream.write ((line + '\n').encode ('ascii'))
-        for line in self.postscript:
-            stream.write ((line + '\n').encode ('ascii'))
+        for line in self.codes:
+          stream.write ((line + '\n').encode ('ascii'))
+      for line in self.postscript:
+          stream.write ((line + '\n').encode ('ascii'))
 
     def start(self):
       self.codes.append(self.startCommand)
