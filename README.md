@@ -10,6 +10,7 @@ G-Code files suitable for engraving with the [Creality Laser Engraver Module](ht
 **Users who use this extension to generate G-Code do so at their own risk.**
 
 Author: [tabsaci](https://github.com/tabsaci)
+
 Original Author: [Marty McGuire](https://github.com/martymcguire)
 
 Website: [http://github.com/tabsaci/inkscape-unicorn](http://github.com/tabsaci/inkscape-unicorn)
