@@ -21,6 +21,9 @@ def parseLengthWithUnits( str ):
   if s[-2:] == 'mm':
     u = 'mm'
     s = s[:-2]
+  if s[-2:] == 'cm':
+    u = 'cm'
+    s = s[:-2]
   elif s[-1:] == '%':
     u = '%'
     s = s[:-1]
@@ -211,7 +214,7 @@ class SvgParser:
       if not v:
         raise ValueError ('Couldn\'t parse the value: ' + str)
         return None
-      elif ( u == '' ) or ( u == 'px' ) or ( u == 'mm'):
+      elif ( u == '' ) or ( u == 'px' ) or ( u == 'mm') or (u == 'cm'):
         return v
       elif u == '%':
         return float( default ) * v / 100.0
@@ -227,7 +230,9 @@ class SvgParser:
     if (str):
        v, u = parseLengthWithUnits (str);
        if (u == 'mm'):
-        return 1.0  
+         return 1.0  
+       elif (u == 'cm'):
+         return 0.1
     return 0.28222 # 0.28222 scale determined by comparing pixels-per-mm in a default Inkscape file.
     
 
@@ -290,12 +295,15 @@ class SvgParser:
             pass
         else:
           pass
-#      elif not isinstance(node.tag, basestring):
-#        pass
+      elif not isinstance(node.tag, str):
+        pass
       else:
         entity = self.make_entity(node, matNew)
         if entity == None:
-          inkex.errormsg('Warning: unable to draw object, please convert it to a path first.')
+          if (hasattr (node, 'tag_name')):
+            inkex.errormsg('Warning: unable to draw object \"' + node.tag_name + '", please convert it to a path first.')
+          else:
+            inkex.errormsg('Warning: unable to draw object, please convert it to a path first.')
 
   def make_entity(self,node,mat):
     for nodetype in SvgParser.entity_map.keys():
