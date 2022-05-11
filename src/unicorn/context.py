@@ -37,7 +37,8 @@ class GCodeContext:
           "M0 Turn on laser to set the focus point",
           self.startCommand,
           "M0 Set focus point of the laser",
-          self.endCommand
+          self.endCommand,
+          "M0 Put on the actual workpiece"
         ]
       else:
         self.preamble += [
@@ -51,6 +52,7 @@ class GCodeContext:
 		self.endCommand,
 		"G4 P%d (wait %dms)" % (self.delay, self.delay),
 		"M300 S255 (turn off servo)",
+        "G0 F%.2f" % (self.travel_speed),
         "G0 X%0.2F Y%0.2F Z%0.2F (go to start point)" % (self.x_offset, self.y_offset, self.z_offset),
 		"M18 (drives off)",
       ]

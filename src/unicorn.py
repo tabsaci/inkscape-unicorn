@@ -36,7 +36,7 @@ class MyEffect(inkex.Effect):
                       help="Autohome, and go to xyz offset before starting")
     self.arg_parser.add_argument("--xyz-speed",
                       action="store", type=float,
-                      dest="xyz_speed", default="500.0",
+                      dest="xyz_speed", default="350.0",
                       help="XYZ axes speed in mm/min")
     self.arg_parser.add_argument("--travel-speed",
                       action="store", type=float,
