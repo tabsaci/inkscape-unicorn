@@ -82,3 +82,47 @@ class PolyLine(Entity):
 				context.stop()
 				context.codes.append("")
 
+class TestRect (Entity):
+	def __str__(self):
+		thisStr =  "TestRect with bottom left at [%.2f, %.2f] and size %.2fx%.2f" % (self.bottom, self.left, self.width, self. height)
+		if self.laserIntensity is not None:
+			thisStr += ", laser intensity at " + str (self.laserIntensity)
+		else:
+			thisStr += ", laser intensity at full"
+
+		if self.contourOnly is True:
+			thisStr += ", countour only"
+		else:
+			thisStr += ", filled with " + str (self.fillDensity) + " density";
+		
+		return thisStr
+
+	def __init__(self, bottom, left, speed, width, height, contourOnly, fillDensity, laserIntensity):
+		self.speed = speed
+		self.bottom = bottom
+		self.left = left
+		self.width = width
+		self.height = height
+		self.contourOnly = contourOnly
+		self.fillDensity = fillDensity
+		self.laserIntensity = laserIntensity
+
+	def get_gcode(self, context):
+		context.xyz_speed = self.speed
+		context.setLaserIntensity (self.laserIntensity)
+
+		context.codes.append("(" + str(self) + ")")
+		context.go_to_point (self.left, self.bottom)
+		context.draw_to_point (context.getX ()				, context.getY () + self.height)
+		context.draw_to_point (context.getX () + self.width	, context.getY ())
+		context.draw_to_point (context.getX ()				, context.getY () - self.height)
+		context.draw_to_point (context.getX () - self.width	, context.getY ())
+		if not self.contourOnly:
+		  targetY = context.getY () + self.height
+		  while context.getY () < targetY - self.fillDensity:
+		    context.go_to_point (self.left, context.getY () + self.fillDensity)
+		    context.draw_to_point (context.getX () + self.width, context.getY ())
+		context.stop ()
+		context.codes.append("")
+		
+
