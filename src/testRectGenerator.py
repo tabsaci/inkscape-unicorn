@@ -31,7 +31,7 @@ def GetTestContext ():
     y_offset = 14,
     z_offset = 95,
     num_runs = 1,
-    file = "")
+    comment = None)
   return context
 
 def GenerateSpeedTest (output, count, width, height, gap, speedFrom, speedTo):

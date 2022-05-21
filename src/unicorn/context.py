@@ -2,7 +2,7 @@ from math import *
 import sys
 
 class GCodeContext:
-    def __init__(self, xyz_speed, travel_speed, delay, goHome, x_offset, y_offset, z_offset, num_runs, file):
+    def __init__(self, xyz_speed, travel_speed, delay, goHome, x_offset, y_offset, z_offset, num_runs, comment):
       self.xyz_speed = xyz_speed
       self.travel_speed = travel_speed
       self.delay = delay
@@ -21,9 +21,11 @@ class GCodeContext:
       self.setLaserIntensity (255)
       self.endCommand = "M107"
 
-      self.preamble = [
-        "(Scribbled version of %s)" % (file),
-        "( %s )" % " ".join(sys.argv),
+      self.preamble = []      
+      if comment != None:
+        self.preamble += [ "( %s )" % (comment) ]
+      self.preamble += [
+        "( Generation parameters: %s )" % " ".join(sys.argv),
         "G21 (metric ftw)",
         "G90 (absolute mode)",
         "G0 F%0.2F (set speed for travel)" % (self.travel_speed),
