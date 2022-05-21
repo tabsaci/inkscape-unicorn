@@ -18,7 +18,7 @@ class GCodeContext:
       self.drawing = False
       self.actPosition = None
 
-      self.startCommand = "M106"
+      self.setLaserIntensity (255)
       self.endCommand = "M107"
 
       self.preamble = [
@@ -67,22 +67,40 @@ class GCodeContext:
           stream.write ((line + '\n').encode ('ascii'))
       for line in self.postscript:
           stream.write ((line + '\n').encode ('ascii'))
+  
+    def setLaserIntensity (self, laserIntensity):
+      if laserIntensity is None or laserIntensity < 0 or laserIntensity >= 255:
+        self.startCommand = "M106"
+      elif laserIntensity == 0:
+        raise ValueError ()
+      else:
+        self.startCommand = "M106 S%0.2F"  % (laserIntensity)
 
-    def start(self):
-      self.codes.append(self.startCommand)
-      self.codes.append("G4 P%d (wait %dms)" % (self.delay, self.delay))
+    def start (self):
+      self.codes.append (self.startCommand)
+      self.codes.append ("G4 P%d (wait %dms)" % (self.delay, self.delay))
       self.drawing = True
 
-    def stop(self):
-      self.codes.append(self.endCommand)
-      self.codes.append("G4 P%d (wait %dms)" % (self.delay, self.delay))
+    def stop (self):
+      self.codes.append (self.endCommand)
+      self.codes.append ("G4 P%d (wait %dms)" % (self.delay, self.delay))
       self.drawing = False
+
+    def getX (self):
+      if self.actPosition is None:
+        return None
+      return self.actPosition[0]
+
+    def getY (self):
+      if self.actPosition is None:
+        return None
+      return self.actPosition[1]
 
     def isAt (self, x, y):
       if self.actPosition is None or x is None or y is None:
         return False
-      xEqual = round (self.actPosition[0], 2) == round (x, 2)
-      yEqual = round (self.actPosition[1], 2) == round (y, 2)
+      xEqual = round (self.getX (), 2) == round (x, 2)
+      yEqual = round (self.getY (), 2) == round (y, 2)
       return xEqual and yEqual
 
     def go_to_point(self, x, y):
