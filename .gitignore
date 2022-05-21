@@ -5,3 +5,7 @@
 /.vs
 /inkscape-unicorn.sln
 /inkscape-unicorn.pyproj
+/src/customRectsTest.gcode
+/src/fillDensityTest.gcode
+/src/laserIntensityTest.gcode
+/src/speedTest.gcode
