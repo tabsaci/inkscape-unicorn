@@ -74,7 +74,7 @@ class GCodeContext:
       elif laserIntensity == 0:
         raise ValueError ()
       else:
-        self.startCommand = "M106 S%0.2F"  % (laserIntensity)
+        self.startCommand = "M106 S%d"  % (laserIntensity)
 
     def start (self):
       self.codes.append (self.startCommand)
