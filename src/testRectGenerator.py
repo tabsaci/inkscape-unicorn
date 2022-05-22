@@ -21,12 +21,12 @@ import os
 from unicorn.entities import TestRect
 from unicorn.context import GCodeContext
 
-def GetTestContext ():
+def GetTestContext (goHome):
   context = GCodeContext (
     xyz_speed = 350,
     travel_speed = 6000,
     delay = 20, 
-    goHome = False,
+    goHome = goHome,
     x_offset = 52,
     y_offset = 14,
     z_offset = 95,
@@ -84,7 +84,7 @@ def GenerateLaserIntensityTest (output, count, width, height, gap, speed, densit
 
 def GenerateCustomRectsTest (output, gap, rects):
   left = 0
-  context = GetTestContext ()
+  context = GetTestContext (False)
   for rect in rects:
     rect.get_gcode (context)
     left += rect.width + gap
@@ -145,6 +145,47 @@ def GenerateTestScripts ():
     ])
 
 
+def CutTest (gap, numRunsFrom, numRunsTo, zOffsetFrom, zOffsetTo, count):
+  context = GetTestContext (True)
+  zStep = (zOffsetTo - zOffsetFrom) / (count - 1) 
+  actZ = 0
+  actLeft = 0
+  actBottom = 0
+  for numRunsIndex in range (numRunsFrom, numRunsTo + 1): # the rows - each row, different runNum
+    for zOffsetIndex in range (count): # the columns - each column, different zOffset
+      rect = TestRect (
+        bottom = actBottom, 
+        left = actLeft,
+        speed = 350, # should be customisable?
+        width = 10,
+        height = 10,
+        contourOnly = True,
+        fillDensity = 1.0,
+        laserIntensity = 255)
+      for i in range (numRunsIndex): # the runs, with modified Z offset in each run
+        context.go_to_z (actZ)
+        rect.get_gcode (context)
+        actZ -= zOffsetFrom + zOffsetIndex * zStep
+      actLeft += rect.width + gap
+      actZ = 0
+    actLeft = 0
+    actBottom += rect.height + gap
+
+  folderPath = os.path.dirname (os.path.realpath (__file__))
+  filePath = os.path.join (folderPath, "cutTest.gcode")
+  with open (filePath, 'wb') as stream:  
+    context.generate (stream)
+
+
+
+
 if __name__ == '__main__':
-  GenerateTestScripts ()
+  #GenerateTestScripts ()
+  CutTest (
+    gap = 2,
+    numRunsFrom = 3,
+    numRunsTo = 6,
+    zOffsetFrom = 0.12,
+    zOffsetTo = 0.32,
+    count = 6)
 
