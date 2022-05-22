@@ -16,7 +16,7 @@ class GCodeContext:
       self.num_runs = num_runs
       
       self.drawing = False
-      self.actPosition = None
+      self.actPosition = (self.x_offset, self.y_offset, self.z_offset)
 
       self.setLaserIntensity (255)
       self.endCommand = "M107"
@@ -88,37 +88,49 @@ class GCodeContext:
       self.codes.append ("G4 P%d (wait %dms)" % (self.delay, self.delay))
       self.drawing = False
 
-    def getX (self):
+    def getX (self) -> float:
       if self.actPosition is None:
         return None
       return self.actPosition[0]
 
-    def getY (self):
+    def getY (self) -> float:
       if self.actPosition is None:
         return None
       return self.actPosition[1]
 
-    def isAt (self, x, y):
-      if self.actPosition is None or x is None or y is None:
+    def getZ (self) -> float:
+      if self.actPosition is None:
+        return None
+      return self.actPosition[2]
+
+    def isAt (self, x, y, z):
+      if self.actPosition is None or x is None or y is None or z is None:
         return False
       xEqual = round (self.getX (), 2) == round (x, 2)
       yEqual = round (self.getY (), 2) == round (y, 2)
-      return xEqual and yEqual
+      zEqual = round (self.getZ (), 2) == round (z, 2)
+      return xEqual and yEqual and zEqual
 
-    def go_to_point(self, x, y):
-      if self.isAt (x, y):
+    def go_to_z (self, z):
+      if self.isAt (self.getX (), self.getY (), z):
         return
-      else:
-        if self.drawing: 
-            self.stop ()
-        self.codes.append("G1 X%.2f Y%.2f F%.2f" % (self.x_offset + x, self.y_offset + y, self.travel_speed)) 
-      self.actPosition = (x,y)
+      if self.drawing: 
+        self.stop ()
+      self.codes.append ("G1 Z%.2f" % (self.z_offset + z)) 
+      self.actPosition = (self.getX (), self.getY (), z)
 
-    def draw_to_point(self, x, y):
-      if self.isAt (x, y):
-          return
-      else:
-        if self.drawing == False:
-            self.start ()
-        self.codes.append("G1 X%0.2f Y%0.2f F%0.2f" % (self.x_offset + x, self.y_offset + y, self.xyz_speed))
-      self.actPosition = (x,y)
+    def go_to_point (self, x, y):
+      if self.isAt (x, y, self.getZ ()):
+        return
+      if self.drawing: 
+        self.stop ()
+      self.codes.append("G1 X%.2f Y%.2f F%.2f" % (self.x_offset + x, self.y_offset + y, self.travel_speed)) 
+      self.actPosition = (x, y, self.getZ ())
+
+    def draw_to_point (self, x, y):
+      if self.isAt (x, y, self.getZ ()):
+        return
+      if self.drawing == False:
+        self.start ()
+      self.codes.append("G1 X%0.2f Y%0.2f F%0.2f" % (self.x_offset + x, self.y_offset + y, self.xyz_speed))
+      self.actPosition = (x, y, self.getZ ())
