@@ -44,7 +44,7 @@ class MyEffect(inkex.Effect):
                       help="Travel speed in mm/min")
     self.arg_parser.add_argument("--x-offset",
                       action="store", type=float,
-                      dest="x_offset", default="52.0",
+                      dest="x_offset", default="54.0",
                       help="Starting X position")
     self.arg_parser.add_argument("--y-offset",
                       action="store", type=float,

@@ -14,7 +14,7 @@
 	</page>
 	<page name="page_homing" _gui-text="Homing">
 	  <param name="goHome" type="boolean" _gui-text="Autohome, and go to xyz offset before starting">false</param>
-	  <param name="x-offset" type="float" min="0.0" max="500.00" _gui-text="X value of home in mm:">52.00</param>
+	  <param name="x-offset" type="float" min="0.0" max="500.00" _gui-text="X value of home in mm:">54.00</param>
 	  <param name="y-offset" type="float" min="0.0" max="500.00" _gui-text="Y value of home in mm:">14.00</param>
 	  <param name="z-offset" type="float" min="0.0" max="500.00" _gui-text="Z value of home in mm:">95.00</param>
     </page>

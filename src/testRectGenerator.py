@@ -27,7 +27,7 @@ def GetTestContext (goHome):
     travel_speed = 6000,
     delay = 20, 
     goHome = goHome,
-    x_offset = 52,
+    x_offset = 54,
     y_offset = 14,
     z_offset = 95,
     num_runs = 1,
