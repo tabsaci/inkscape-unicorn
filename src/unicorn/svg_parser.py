@@ -105,7 +105,7 @@ class SvgPath(unicorn.entities.PolyLine):
     return newpath
 
 class SvgRect(SvgPath):
-  def load(self, node, mat):
+  def load(self, node, mat):    # Note: rx and ry values are not handled
     newpath = self.new_path_from_node(node)
     x = float(node.get('x'))
     y = float(node.get('y'))
@@ -176,7 +176,7 @@ class SvgCircle(SvgEllipse):
     SvgPath.load(self,self.make_ellipse_path(rx,rx,node), mat)
 
 class SvgText(SvgIgnoredEntity):
-  def load(self,node,mat):
+  def load(self,node,mat):    # Note: empty text also raises warning
     inkex.errormsg('Warning: unable to draw text. please convert it to a path first.')
     SvgIgnoredEntity.load(self,node,mat)
 
