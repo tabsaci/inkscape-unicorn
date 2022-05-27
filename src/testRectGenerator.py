@@ -43,7 +43,7 @@ def GenerateSpeedTest (output, count, width, height, gap, speedFrom, speedTo):
   actSpeed = speedFrom
   rects = []
   for index in range (count):
-    rects.append (TestRect (0, left, actSpeed, width, height, True, 0.0, None)) # bottom, left, speed, width, height, contourOnly, fillDensity, laserIntensity
+    rects.append (TestRect (0, left, actSpeed, width, height, True, None, None)) # bottom, left, speed, width, height, contourOnly, fillDensity, laserIntensity
     left += width + gap
     actSpeed += (speedTo - speedFrom) / (count - 1) 
   GenerateCustomRectsTest (output, gap, rects)
@@ -76,7 +76,7 @@ def GenerateLaserIntensityTest (output, count, width, height, gap, speed, densit
   actIntensity = intensityFrom
   rects = []
   for index in range (count):
-    rects.append (TestRect (30, left, speed, width, height, False, density, actIntensity))
+    rects.append (TestRect (30, left, speed, width, height, True, density, actIntensity))
     left += width + gap
     actIntensity += (intensityTo - intensityFrom) / (count - 1) 
   GenerateCustomRectsTest (output, gap, rects)
@@ -145,22 +145,24 @@ def GenerateTestScripts ():
     ])
 
 
-def CutTest (gap, numRunsFrom, numRunsTo, zOffsetFrom, zOffsetTo, count):
+def CutTest (gap, numRunsFrom, numRunsTo, zOffsetFrom, zOffsetTo, count, speed):
   context = GetTestContext (True)
-  zStep = (zOffsetTo - zOffsetFrom) / (count - 1) 
+  zStep = 0.0
+  if count > 1:
+    zStep = (zOffsetTo - zOffsetFrom) / (count - 1) 
   actZ = 0
   actLeft = 0
-  actBottom = 0
+  actBottom = 50
   for numRunsIndex in range (numRunsFrom, numRunsTo + 1): # the rows - each row, different runNum
     for zOffsetIndex in range (count): # the columns - each column, different zOffset
       rect = TestRect (
         bottom = actBottom, 
         left = actLeft,
-        speed = 350, # should be customisable?
+        speed = speed,
         width = 10,
         height = 10,
-        contourOnly = True,
-        fillDensity = 1.0,
+        contour = True,
+        fillDensity = None,
         laserIntensity = 255)
       for i in range (numRunsIndex): # the runs, with modified Z offset in each run
         context.go_to_z (actZ)
@@ -183,9 +185,10 @@ if __name__ == '__main__':
   #GenerateTestScripts ()
   CutTest (
     gap = 2,
-    numRunsFrom = 3,
+    numRunsFrom = 6,
     numRunsTo = 6,
-    zOffsetFrom = 0.12,
-    zOffsetTo = 0.32,
-    count = 6)
+    zOffsetFrom = 1,
+    zOffsetTo = 1,
+    count = 1,
+    speed = 70)
 

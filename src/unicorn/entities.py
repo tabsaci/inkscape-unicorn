@@ -90,20 +90,20 @@ class TestRect (Entity):
 		else:
 			thisStr += ", laser intensity at full"
 
-		if self.contourOnly is True:
+		if self.contour is True:
 			thisStr += ", countour only"
 		else:
 			thisStr += ", filled with " + str (self.fillDensity) + " density";
 		
 		return thisStr
 
-	def __init__(self, bottom, left, speed, width, height, contourOnly, fillDensity, laserIntensity):
+	def __init__(self, bottom, left, speed, width, height, contour, fillDensity, laserIntensity):
 		self.speed = speed
 		self.bottom = bottom
 		self.left = left
 		self.width = width
 		self.height = height
-		self.contourOnly = contourOnly
+		self.contour = contour
 		self.fillDensity = fillDensity
 		self.laserIntensity = laserIntensity
 
@@ -113,11 +113,12 @@ class TestRect (Entity):
 
 		context.codes.append("(" + str(self) + ")")
 		context.go_to_point (self.left, self.bottom)
-		context.draw_to_point (context.getX ()				, context.getY () + self.height)
-		context.draw_to_point (context.getX () + self.width	, context.getY ())
-		context.draw_to_point (context.getX ()				, context.getY () - self.height)
-		context.draw_to_point (context.getX () - self.width	, context.getY ())
-		if not self.contourOnly:
+		if self.contour:		
+		  context.draw_to_point (context.getX ()				, context.getY () + self.height)
+		  context.draw_to_point (context.getX () + self.width	, context.getY ())
+		  context.draw_to_point (context.getX ()				, context.getY () - self.height)
+		  context.draw_to_point (context.getX () - self.width	, context.getY ())
+		if self.fillDensity is not None:
 		  targetY = context.getY () + self.height
 		  while context.getY () < targetY - self.fillDensity:
 		    context.go_to_point (self.left, context.getY () + self.fillDensity)
