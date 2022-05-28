@@ -23,9 +23,11 @@ class GCodeContext:
 
       self.preamble = []      
       if comment != None:
-        self.preamble += [ "( %s )" % (comment) ]
+        self.preamble += [ "( %s )" % (comment.encode ("ascii", "ignore")) ]
+      parameterList = " ".join (sys.argv)
+      parameterList = parameterList.encode ("ascii", "ignore")
       self.preamble += [
-        "( Generation parameters: %s )" % " ".join(sys.argv),
+        "( Generation parameters: %s )" % parameterList,
         "G21 (metric ftw)",
         "G90 (absolute mode)",
         "G0 F%0.2F (set speed for travel)" % (self.travel_speed),
