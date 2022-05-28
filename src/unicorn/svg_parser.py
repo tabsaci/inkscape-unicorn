@@ -105,17 +105,29 @@ class SvgPath(unicorn.entities.PolyLine):
     return newpath
 
 class SvgRect(SvgPath):
-  def load(self, node, mat):    # Note: rx and ry values are not handled
+  def load(self, node, mat):
     newpath = self.new_path_from_node(node)
-    x = float(node.get('x'))
-    y = float(node.get('y'))
-    w = float(node.get('width'))
-    h = float(node.get('height'))
+    x = float (node.get ('x'))
+    y = float (node.get ('y'))
+    w = float (node.get ('width'))
+    h = float (node.get ('height'))
+    rx = 0.0
+    if node.get ('rx') != None:
+      rx = float (node.get ('rx'))
+    ry = 0.0
+    if node.get ('ry') != None:
+      ry = float (node.get ('ry'))
+
     a = []
-    a.append(['M', [x,y]])
-    a.append(['l', [w,0]])
-    a.append(['l', [0,h]])
-    a.append(['l', [-w,0]])
+    a.append(['M', [x + rx          , y]])
+    a.append(['l', [w - 2 * rx      , 0]])
+    a.append(['c', [rx, 0, rx, 0, rx, ry]])
+    a.append(['l', [0               , h - 2 * ry]])
+    a.append(['c', [0, ry, 0, ry, -rx, ry]])
+    a.append(['l', [-(w - 2 * rx)   , 0]])
+    a.append(['c', [-rx, 0, -rx, 0, -rx, -ry]])
+    a.append(['l', [0               , -(h - 2 * ry)]])
+    a.append(['c', [0, -ry, 0, -ry, rx, -ry]])
     a.append(['Z', []])
     newpath.set('d', str(Path(a)))
     SvgPath.load(self,newpath,mat)
