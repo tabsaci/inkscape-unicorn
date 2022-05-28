@@ -111,12 +111,8 @@ class SvgRect(SvgPath):
     y = float (node.get ('y'))
     w = float (node.get ('width'))
     h = float (node.get ('height'))
-    rx = 0.0
-    if node.get ('rx') != None:
-      rx = float (node.get ('rx'))
-    ry = 0.0
-    if node.get ('ry') != None:
-      ry = float (node.get ('ry'))
+    rx = float (node.get ('rx', '0'))
+    ry = float (node.get ('ry', '0'))
 
     a = []
     a.append(['M', [x + rx          , y]])
