@@ -129,6 +129,7 @@ class SvgRect(SvgPath):
     a.append(['l', [0               , -(h - 2 * ry)]])
     a.append(['c', [0, -ry, 0, -ry, rx, -ry]])
     a.append(['Z', []])
+    print (str(Path(a)))
     newpath.set('d', str(Path(a)))
     SvgPath.load(self,newpath,mat)
 
