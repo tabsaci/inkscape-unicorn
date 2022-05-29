@@ -94,6 +94,12 @@ class SvgPath(unicorn.entities.PolyLine):
         points.append((csp[1][0],csp[1][1]))
       self.segments.append(points)
 
+    style = node.get('style')
+    if style is not None:
+      self.withFill = "fill:none" not in style.lower ()
+    else:
+      self.withFill = True
+
   def new_path_from_node(self, node):
     newpath = etree.Element(inkex.addNS('path','svg'))
     s = node.get('style')

@@ -1,13 +1,37 @@
 from math import cos, sin, radians
 import pprint
 
+epsilon = 0.0000001
+
 class Entity:
 	def get_gcode(self,context):
 		raise NotImplementedError()
 
+class Point:
+	def __init__ (self, x, y):
+		self.x = x
+		self.y = y
+
+	def __getitem__ (self, key):
+		if key == 0:
+			return self.x
+		elif key == 1:
+			return self.y
+		raise IndexError ()
+
+	def __str__ (self):
+		return "[%.5f, %.5f]" % (self.x, self.y)
+
+	def IsNear (self, other):
+		return abs (self.x - other.x) < epsilon and abs (self.y - other.y) < epsilon
+
 class Line(Entity):
+	def __init__(self, start, end):
+		self.start = Point (start[0], start[1])
+		self.end = Point (end[0], end[1])
+
 	def __str__(self):
-		return "Line from [%.2f, %.2f] to [%.2f, %.2f]" % (self.start[0], self.start[1], self.end[0], self.end[1])
+		return "Line from " + str (self.start) + " to " + str (self.end)
 
 	def get_gcode(self,context):
 		"Emit gcode for drawing line"
@@ -15,6 +39,51 @@ class Line(Entity):
 		context.go_to_point(self.start[0],self.start[1])
 		context.draw_to_point(self.end[0],self.end[1])
 		context.codes.append("")
+
+	def get_intersection_with_line (self, line):
+		# https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
+		x1 = self.start.x
+		y1 = self.start.y
+		x2 = self.end.x
+		y2 = self.end.y
+		x3 = line.start.x
+		y3 = line.start.y
+		x4 = line.end.x
+		y4 = line.end.y
+		resx = (x1*y2-y1*x2)*(x3-x4) - (x1-x2)*(x3*y4-y3*x4)
+		resy = (x1*y2-y1*x2)*(y3-y4) - (y1-y2)*(x3*y4-y3*x4)
+		d = (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4)
+		if d == 0:
+			return None
+		return Point (resx / d, resy / d)
+
+	def get_intersections_with_line_segments (self, lineSegments):
+		result = []
+		for lineSegment in lineSegments:
+			intersection = self.get_intersection_with_line (lineSegment)
+			if intersection is not None and lineSegment.is_point_on_line (intersection) and self.is_point_on_line (intersection):
+				if len (result) == 0 or (len (result) > 0 and not result[-1].IsNear (intersection)):
+					result.append (intersection)
+		return result
+
+	def is_point_on_line (self, point):
+		#https://stackoverflow.com/questions/328107/how-can-you-determine-a-point-is-between-two-other-points-on-a-line-segment
+		crossproduct = (point.y - self.start.y) * (self.end.x - self.start.x) - (point.x - self.start.x) * (self.end.y - self.start.y)
+
+		# compare versus epsilon for floating point values, or != 0 if using integers	
+		if abs(crossproduct) > epsilon:
+			return False
+
+		dotproduct = (point.x - self.start.x) * (self.end.x - self.start.x) + (point.y - self.start.y)*(self.end.y - self.start.y)
+		if dotproduct < 0:
+			return False
+
+		squaredlengthba = (self.end.x - self.start.x)*(self.end.x - self.start.x) + (self.end.y - self.start.y)*(self.end.y - self.start.y)
+		if dotproduct - squaredlengthba > epsilon:
+			return False
+
+		return True
+
 
 class Circle(Entity):
 	def __str__(self):
@@ -52,7 +121,6 @@ class Arc(Entity):
 
 		context.codes.append("(" + str(self) + ")")
 		context.go_to_point(start[0],start[1])
-		context.last = end
 		context.start()
 		context.codes.append(arc_code)
 		context.stop()
@@ -67,20 +135,53 @@ class PolyLine(Entity):
 	def __str__(self):
 		return "Polyline consisting of %d segments." % len(self.segments)
 
-	def get_gcode(self,context):
+	def get_gcode(self, context):
 		"Emit gcode for drawing polyline"
-		if hasattr(self, 'segments'):
-			for points in self.segments:
-				start = points[0]
-	
-				context.codes.append("(" + str(self) + ")")
-				context.go_to_point(start[0],start[1])
-				context.start()
-				for point in points[1:]:
-					context.draw_to_point(point[0],point[1])
-					context.last = point
-				context.stop()
-				context.codes.append("")
+		if hasattr (self, 'segments'):
+			self.draw_countour (context)
+		if hasattr (self, 'withFill') and self.withFill:
+			self.draw_fill (context)
+
+	def draw_countour (self, context):
+		for points in self.segments:
+			context.codes.append("(" + str(self) + ")")
+			context.go_to_point(points[0][0],points[0][1])
+			context.start()
+			for point in points[1:]:
+				context.draw_to_point(point[0],point[1])
+			context.stop()
+			context.codes.append("")
+
+	def draw_fill (self, context):
+		for points in self.segments:
+			fillLines = self.get_horizontal_fill_lines (points, 0.4) # TODO hardcoded gap
+			contourLines = self.get_contour_lines (points)
+			for fillLine in fillLines:
+				intersections = fillLine.get_intersections_with_line_segments (contourLines)
+				if len (intersections) % 2 != 0:
+					for intersection in intersections:
+						print ("unprocessed intersection:" + str (intersection))
+				for index in range (0, int (len (intersections) / 2.0)):
+					indexStart = index * 2
+					linePart = Line (intersections[indexStart], intersections[indexStart + 1])
+					linePart.get_gcode (context)
+
+	def get_contour_lines (self, points):
+		lines = []
+		for pointIndex in range (1, len (points)):
+			lines.append (Line (points[pointIndex - 1], points[pointIndex]))
+		return lines
+
+	def get_horizontal_fill_lines (self, points, gap):
+		ymin = min (points, key = lambda point: point[1])[1]
+		ymax = max (points, key = lambda point: point[1])[1]
+		xmin = min (points, key = lambda point: point[0])[0]
+		xmax = max (points, key = lambda point: point[0])[0]
+		lines = []
+		while ymin < ymax:
+			lines.append (Line ((xmin - 1, ymin), (xmax + 1, ymin)))
+			ymin += gap
+		return lines
 
 class TestRect (Entity):
 	def __str__(self):
