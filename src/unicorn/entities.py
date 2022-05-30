@@ -88,6 +88,14 @@ class Line(Entity):
 	def get_length (self):
 		return self.start.distance (self.end)
 
+	def get_slope (self):
+		return (self.end.y - self.start.y) - (self.end.x - self.start.x)
+
+	def is_parallel_with (self, other):
+		mySlope = self.get_slope ()
+		othersSlope = other.get_slope ()
+		return abs (mySlope - othersSlope) < epsilon
+
 
 class Circle(Entity):
 	def __str__(self):
@@ -193,13 +201,13 @@ class PolyLine(Entity):
 		return lines
 
 	def get_horizontal_fill_lines (self, points, gap):
-		ymin = min (points, key = lambda point: point[1])[1]
-		ymax = max (points, key = lambda point: point[1])[1]
-		xmin = min (points, key = lambda point: point[0])[0]
-		xmax = max (points, key = lambda point: point[0])[0]
+		ymin = min (points, key = lambda point: point[1])[1] + gap
+		ymax = max (points, key = lambda point: point[1])[1] - gap
+		xmin = min (points, key = lambda point: point[0])[0] - 1
+		xmax = max (points, key = lambda point: point[0])[0] + 1
 		lines = []
 		while ymin < ymax:
-			lines.append (Line ((xmin - 1, ymin), (xmax + 1, ymin)))
+			lines.append (Line ((xmin, ymin), (xmax, ymin)))
 			ymin += gap
 		return lines
 
