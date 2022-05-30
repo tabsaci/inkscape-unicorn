@@ -1,4 +1,4 @@
-from math import cos, sin, radians
+from math import cos, sin, radians, sqrt
 import pprint
 
 epsilon = 0.0000001
@@ -24,6 +24,12 @@ class Point:
 
 	def IsNear (self, other):
 		return abs (self.x - other.x) < epsilon and abs (self.y - other.y) < epsilon
+
+	def distanceSquare (self, point):
+		return (self.x - point.x)**2 + (self.y - point.y)**2
+
+	def distance (self, point):
+		return sqrt (self.distanceSquare (point))
 
 class Line(Entity):
 	def __init__(self, start, end):
@@ -62,27 +68,25 @@ class Line(Entity):
 		for lineSegment in lineSegments:
 			intersection = self.get_intersection_with_line (lineSegment)
 			if intersection is not None and lineSegment.is_point_on_line (intersection) and self.is_point_on_line (intersection):
-				if len (result) == 0 or (len (result) > 0 and not result[-1].IsNear (intersection)):
-					result.append (intersection)
+				result.append (intersection)
 		return result
 
 	def is_point_on_line (self, point):
 		#https://stackoverflow.com/questions/328107/how-can-you-determine-a-point-is-between-two-other-points-on-a-line-segment
 		crossproduct = (point.y - self.start.y) * (self.end.x - self.start.x) - (point.x - self.start.x) * (self.end.y - self.start.y)
-
 		# compare versus epsilon for floating point values, or != 0 if using integers	
 		if abs(crossproduct) > epsilon:
 			return False
-
 		dotproduct = (point.x - self.start.x) * (self.end.x - self.start.x) + (point.y - self.start.y)*(self.end.y - self.start.y)
 		if dotproduct < 0:
 			return False
-
-		squaredlengthba = (self.end.x - self.start.x)*(self.end.x - self.start.x) + (self.end.y - self.start.y)*(self.end.y - self.start.y)
+		squaredlengthba = self.end.distanceSquare (self.start)
 		if dotproduct - squaredlengthba > epsilon:
 			return False
-
 		return True
+
+	def get_length (self):
+		return self.start.distance (self.end)
 
 
 class Circle(Entity):
@@ -153,23 +157,39 @@ class PolyLine(Entity):
 			context.codes.append("")
 
 	def draw_fill (self, context):
-		for points in self.segments:
-			fillLines = self.get_horizontal_fill_lines (points, 0.4) # TODO hardcoded gap
-			contourLines = self.get_contour_lines (points)
-			for fillLine in fillLines:
-				intersections = fillLine.get_intersections_with_line_segments (contourLines)
-				if len (intersections) % 2 != 0:
-					for intersection in intersections:
-						print ("unprocessed intersection:" + str (intersection))
-				for index in range (0, int (len (intersections) / 2.0)):
-					indexStart = index * 2
-					linePart = Line (intersections[indexStart], intersections[indexStart + 1])
-					linePart.get_gcode (context)
+		fillLines = self.get_horizontal_fill_lines (self.segments[0], 0.4) # TODO hardcoded gap
+		contourLines = self.get_contour_lines (self.segments)
+		refPointAtStart = True
+		for fillLine in fillLines:
+			intersections = fillLine.get_intersections_with_line_segments (contourLines)
 
-	def get_contour_lines (self, points):
+			refpoint = fillLine.end
+			if refPointAtStart:
+				refpoint = fillLine.start
+				refPointAtStart = False
+			else:
+				refPointAtStart = True
+			intersections.sort (key = lambda p: refpoint.distanceSquare (p))
+
+			if len (intersections) % 2 != 0:
+				message = "Unprocessed intersection(s): "
+				for intersection in intersections:
+					message += str (intersection)
+				print (message)
+				continue
+
+			for index in range (0, int (len (intersections) / 2.0)):
+				indexStart = index * 2
+				linePart = Line (intersections[indexStart], intersections[indexStart + 1])
+				linePart.get_gcode (context)
+
+	def get_contour_lines (self, segments):
 		lines = []
-		for pointIndex in range (1, len (points)):
-			lines.append (Line (points[pointIndex - 1], points[pointIndex]))
+		for segment in segments:
+			for pointIndex in range (1, len (segment)):
+				lineCandidate = Line (segment[pointIndex - 1], segment[pointIndex])
+				if lineCandidate.get_length () > epsilon:
+					lines.append (lineCandidate)
 		return lines
 
 	def get_horizontal_fill_lines (self, points, gap):
